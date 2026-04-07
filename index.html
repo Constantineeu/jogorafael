@@ -7,8 +7,8 @@
 
   <style>
     :root{
-      --bg-1:#0b1220;
-      --bg-2:#111c31;
+      --bg-1:#08111f;
+      --bg-2:#13233f;
       --panel:#16233b;
       --panel-2:#1d2d4b;
       --card-front:#334763;
@@ -20,8 +20,8 @@
       --danger:#ef4444;
       --text:#f8fafc;
       --muted:#cbd5e1;
-      --shadow:0 14px 40px rgba(0,0,0,.35);
-      --radius:22px;
+      --shadow:0 16px 45px rgba(0,0,0,.35);
+      --radius:24px;
       --card-size:clamp(58px, 13vw, 110px);
       --gap:14px;
     }
@@ -37,7 +37,8 @@
       font-family: Arial, Helvetica, sans-serif;
       color:var(--text);
       background:
-        radial-gradient(circle at top, rgba(56,189,248,.10), transparent 30%),
+        radial-gradient(circle at top, rgba(56,189,248,.12), transparent 30%),
+        radial-gradient(circle at bottom right, rgba(251,191,36,.08), transparent 25%),
         linear-gradient(135deg, var(--bg-1), var(--bg-2));
       overflow-x:hidden;
     }
@@ -45,7 +46,7 @@
     .app{
       width:min(1180px, 94%);
       margin:0 auto;
-      padding:28px 0 40px;
+      padding:20px 0 30px;
     }
 
     .hidden{
@@ -61,41 +62,55 @@
       to{opacity:1; transform:translateY(0);}
     }
 
+    /* TELA INICIAL */
+    .home-screen{
+      min-height:calc(100vh - 50px);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .home-wrapper{
+      width:100%;
+      max-width:1000px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:28px;
+    }
+
     .hero{
       text-align:center;
-      margin-bottom:26px;
-    }
-
-    .hero-top{
       display:flex;
-      justify-content:space-between;
+      flex-direction:column;
       align-items:center;
-      gap:12px;
-      margin-bottom:18px;
-      flex-wrap:wrap;
+      gap:14px;
     }
 
-    .hero-spacer{
-      width:100px;
+    .hero h1{
+      font-size:clamp(34px, 5vw, 56px);
+      line-height:1.05;
+      text-shadow:0 10px 24px rgba(0,0,0,.25);
+    }
+
+    .hero p{
+      color:var(--muted);
+      font-size:17px;
+      max-width:650px;
+      line-height:1.5;
     }
 
     .hero-actions{
-      width:100px;
       display:flex;
-      justify-content:flex-end;
-    }
-
-    h1{
-      font-size:clamp(30px, 4vw, 46px);
-      line-height:1.1;
-      flex:1;
-      text-align:center;
+      justify-content:center;
+      gap:12px;
+      flex-wrap:wrap;
     }
 
     .rules-btn{
       border:none;
       border-radius:14px;
-      padding:12px 18px;
+      padding:12px 20px;
       font-size:15px;
       font-weight:bold;
       cursor:pointer;
@@ -111,38 +126,40 @@
     }
 
     .home-layout{
+      width:100%;
       display:grid;
-      grid-template-columns: 1fr 1.1fr;
+      grid-template-columns: 1fr 1fr;
       gap:22px;
-      align-items:start;
+      align-items:stretch;
     }
 
     .panel{
-      background:linear-gradient(180deg, rgba(29,45,75,.95), rgba(18,29,49,.98));
+      background:linear-gradient(180deg, rgba(29,45,75,.96), rgba(15,27,47,.98));
       border:1px solid rgba(255,255,255,.08);
       border-radius:var(--radius);
       box-shadow:var(--shadow);
-      padding:24px;
+      padding:28px 24px;
       backdrop-filter: blur(8px);
     }
 
     .panel h2{
-      font-size:24px;
-      margin-bottom:16px;
+      font-size:26px;
+      margin-bottom:18px;
+      text-align:center;
     }
 
     .level-buttons{
       display:grid;
-      grid-template-columns:repeat(3, 1fr);
-      gap:12px;
-      margin-top:18px;
+      grid-template-columns:1fr;
+      gap:14px;
+      margin-top:10px;
     }
 
     .level-btn{
       border:none;
-      border-radius:16px;
-      padding:16px 10px;
-      font-size:20px;
+      border-radius:18px;
+      padding:18px 12px;
+      font-size:22px;
       font-weight:bold;
       cursor:pointer;
       background:linear-gradient(180deg, var(--accent), var(--accent-2));
@@ -166,20 +183,22 @@
 
     .ranking-header h2{
       margin:0;
+      text-align:left;
+      font-size:24px;
     }
 
     .reset-btn{
-      width:30px;
-      height:30px;
+      width:34px;
+      height:34px;
       border:none;
-      border-radius:8px;
+      border-radius:10px;
       display:flex;
       align-items:center;
       justify-content:center;
       cursor:pointer;
-      font-size:13px;
+      font-size:14px;
       background:transparent;
-      color:rgba(255,255,255,.35);
+      color:rgba(255,255,255,.45);
       border:1px solid rgba(255,255,255,.08);
       transition:.2s;
       flex-shrink:0;
@@ -210,7 +229,7 @@
 
     th, td{
       text-align:center;
-      padding:12px 10px;
+      padding:14px 10px;
       font-size:15px;
     }
 
@@ -234,6 +253,7 @@
       padding:20px;
     }
 
+    /* TELA DO JOGO */
     .game-screen{
       min-height:78vh;
       display:flex;
@@ -336,10 +356,11 @@
       box-shadow:0 0 0 2px rgba(34,197,94,.4), 0 8px 22px rgba(34,197,94,.18);
     }
 
+    /* MODAL */
     .feedback{
       position:fixed;
       inset:0;
-      background:rgba(6,11,20,.55);
+      background:rgba(6,11,20,.58);
       display:flex;
       align-items:center;
       justify-content:center;
@@ -349,7 +370,7 @@
     }
 
     .feedback-card{
-      width:min(420px, 94%);
+      width:min(430px, 94%);
       background:linear-gradient(180deg, #182841, #0f1b2f);
       border-radius:24px;
       padding:28px 22px;
@@ -373,6 +394,7 @@
       font-size:18px;
       color:#dbeafe;
       margin-bottom:18px;
+      line-height:1.5;
     }
 
     .feedback-card strong{
@@ -400,23 +422,24 @@
     .rules-list{
       text-align:left;
       color:#dbeafe;
-      line-height:1.6;
+      line-height:1.7;
       font-size:16px;
       margin:18px 0;
       padding-left:18px;
     }
 
-    @media (max-width: 920px){
+    @media (max-width: 900px){
       .home-layout{
         grid-template-columns:1fr;
+      }
+
+      .home-screen{
+        min-height:auto;
+        padding:30px 0;
       }
     }
 
     @media (max-width: 640px){
-      .level-buttons{
-        grid-template-columns:1fr;
-      }
-
       th, td{
         font-size:13px;
         padding:10px 8px;
@@ -426,18 +449,16 @@
         min-width:180px;
       }
 
-      .hero-top{
-        justify-content:center;
+      .hero h1{
+        font-size:34px;
       }
 
-      .hero-spacer,
-      .hero-actions{
-        width:auto;
+      .panel{
+        padding:22px 18px;
       }
 
-      h1{
-        width:100%;
-        order:-1;
+      .level-btn{
+        font-size:20px;
       }
     }
   </style>
@@ -446,47 +467,46 @@
   <div class="app">
 
     <!-- TELA INICIAL -->
-    <section id="homeScreen" class="screen">
-      <div class="hero">
-        <div class="hero-top">
-          <div class="hero-spacer"></div>
+    <section id="homeScreen" class="screen home-screen">
+      <div class="home-wrapper">
+        <div class="hero">
           <h1>Jogo da Memória Futebol</h1>
+          <p>Escolha um nível e teste sua memória encontrando todos os pares antes do tempo acabar.</p>
+
           <div class="hero-actions">
             <button class="rules-btn" onclick="abrirRegras()">Regras</button>
           </div>
         </div>
-      </div>
 
-      <div class="home-layout">
-        <div class="panel">
-          <h2>Escolha o nível</h2>
+        <div class="home-layout">
+          <div class="panel">
+            <h2>Escolha o nível</h2>
 
-          <div class="level-buttons">
-            <button class="level-btn" onclick="iniciar('facil')">Fácil</button>
-            <button class="level-btn" onclick="iniciar('medio')">Médio</button>
-            <button class="level-btn" onclick="iniciar('dificil')">Difícil</button>
-          </div>
-        </div>
-
-        <div class="panel">
-          <div class="ranking-header">
-            <h2>🏆 Ranking do Difícil</h2>
-            <button class="reset-btn" onclick="resetarRank()" title="Resetar ranking">🗑</button>
+            <div class="level-buttons">
+              <button class="level-btn" onclick="iniciar('facil')">Fácil</button>
+              <button class="level-btn" onclick="iniciar('medio')">Médio</button>
+              <button class="level-btn" onclick="iniciar('dificil')">Difícil</button>
+            </div>
           </div>
 
-          <div class="ranking-box">
-            <table id="rankTable">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Jogador</th>
-                  <th>Pontos</th>
-                  <th>Tempo</th>
-                  <th>Data</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
+          <div class="panel">
+            <div class="ranking-header">
+              <h2>🏆 Ranking</h2>
+              <button class="reset-btn" onclick="resetarRank()" title="Resetar ranking">🗑</button>
+            </div>
+
+            <div class="ranking-box">
+              <table id="rankTable">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Jogador</th>
+                    <th>Pontos</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
@@ -502,7 +522,7 @@
     </section>
   </div>
 
-  <!-- FEEDBACK -->
+  <!-- MODAL -->
   <div id="feedback" class="feedback hidden">
     <div class="feedback-card" id="feedbackCard"></div>
   </div>
@@ -757,7 +777,7 @@
       travado = true;
 
       if(dificuldadeAtual === "dificil"){
-        salvarRank(jogadorNome, pontuacao, tempoRestante);
+        salvarRank(jogadorNome, pontuacao);
 
         if(completouTudo){
           mostrarFeedback(
@@ -799,10 +819,10 @@
         <ul class="rules-list">
           <li>Escolha um nível para começar.</li>
           <li>Clique nas cartas para virar e encontrar os pares.</li>
-          <li>Se acertar o par, as cartas continuam abertas.</li>
-          <li>Se errar, elas viram novamente.</li>
+          <li>Se acertar o par, as cartas permanecem abertas.</li>
+          <li>Se errar, as cartas viram novamente.</li>
           <li>Complete todos os pares antes do tempo acabar.</li>
-          <li>No nível difícil, sua pontuação entra no ranking.</li>
+          <li>No nível difícil, a melhor pontuação fica salva no ranking.</li>
         </ul>
         <button class="modal-btn" onclick="esconderFeedback()">Fechar</button>
       `;
@@ -818,7 +838,7 @@
       return array;
     }
 
-    function salvarRank(nome, pontos, tempo){
+    function salvarRank(nome, pontos){
       let rank = JSON.parse(localStorage.getItem(RANK_KEY)) || [];
       const chave = nome.trim().toLowerCase();
 
@@ -828,24 +848,16 @@
         jogador = {
           chave,
           nome: nome.trim(),
-          pontos: pontos,
-          tempo: tempo,
-          data: new Date().toLocaleDateString("pt-BR")
+          pontos: pontos
         };
         rank.push(jogador);
-      } else if(
-        pontos > jogador.pontos ||
-        (pontos === jogador.pontos && tempo > jogador.tempo)
-      ){
+      } else if(pontos > jogador.pontos){
         jogador.nome = nome.trim();
         jogador.pontos = pontos;
-        jogador.tempo = tempo;
-        jogador.data = new Date().toLocaleDateString("pt-BR");
       }
 
       rank.sort((a, b) =>
         b.pontos - a.pontos ||
-        b.tempo - a.tempo ||
         a.nome.localeCompare(b.nome, "pt-BR")
       );
 
@@ -862,7 +874,7 @@
       if(rank.length === 0){
         tbody.innerHTML = `
           <tr>
-            <td colspan="5" class="empty-rank">Nenhum jogador no ranking ainda.</td>
+            <td colspan="3" class="empty-rank">Nenhum jogador no ranking ainda.</td>
           </tr>
         `;
         return;
@@ -874,8 +886,6 @@
           <td>${index + 1}</td>
           <td>${jogador.nome}</td>
           <td><strong>${jogador.pontos}</strong></td>
-          <td>${jogador.tempo}s</td>
-          <td>${jogador.data}</td>
         `;
         tbody.appendChild(tr);
       });
