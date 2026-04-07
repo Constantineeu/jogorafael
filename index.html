@@ -1,342 +1,884 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<title>Jogo da Memória</title>
-<style>
-body{
-  font-family: Arial;
-  text-align:center;
-  background:linear-gradient(135deg,#0f172a,#1e293b);
-  color:white;
-}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jogo da Memória Futebol</title>
 
-h1{
-  margin-top:20px;
-  font-size:32px;
-}
+  <style>
+    :root{
+      --bg-1:#0b1220;
+      --bg-2:#111c31;
+      --panel:#16233b;
+      --panel-2:#1d2d4b;
+      --card-front:#334763;
+      --card-back:#f8fafc;
+      --accent:#38bdf8;
+      --accent-2:#0ea5e9;
+      --gold:#fbbf24;
+      --success:#22c55e;
+      --danger:#ef4444;
+      --text:#f8fafc;
+      --muted:#cbd5e1;
+      --shadow:0 14px 40px rgba(0,0,0,.35);
+      --radius:22px;
+      --card-size:clamp(58px, 13vw, 110px);
+      --gap:14px;
+    }
 
-#menu{
-  margin-top:30px;
-}
+    *{
+      box-sizing:border-box;
+      margin:0;
+      padding:0;
+    }
 
-#menu button{
-  margin:10px;
-  padding:12px 25px;
-  font-size:18px;
-  border:none;
-  border-radius:10px;
-  cursor:pointer;
-  background:#38bdf8;
-  color:#000;
-  transition:0.3s;
-}
+    body{
+      min-height:100vh;
+      font-family: Arial, Helvetica, sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at top, rgba(56,189,248,.10), transparent 30%),
+        linear-gradient(135deg, var(--bg-1), var(--bg-2));
+      overflow-x:hidden;
+    }
 
-#menu button:hover{
-  background:#0ea5e9;
-  transform:scale(1.05);
-}
+    .app{
+      width:min(1180px, 94%);
+      margin:0 auto;
+      padding:28px 0 40px;
+    }
 
-#topo{
-  font-size:24px;
-  margin:15px;
-}
+    .hidden{
+      display:none !important;
+    }
 
-#tabuleiro{
-  display:grid;
-  justify-content:center;
-  gap:10px;
-  margin-top:20px;
-}
+    .screen{
+      animation:fadeIn .35s ease;
+    }
 
-.carta{
-  width:80px;
-  height:80px;
-  perspective:600px;
-}
+    @keyframes fadeIn{
+      from{opacity:0; transform:translateY(8px);}
+      to{opacity:1; transform:translateY(0);}
+    }
 
-.inner{
-  width:100%;
-  height:100%;
-  position:relative;
-  transform-style:preserve-3d;
-  transition: transform 0.5s;
-}
+    .hero{
+      text-align:center;
+      margin-bottom:26px;
+    }
 
-.carta.virada .inner{
-  transform: rotateY(180deg);
-}
+    .hero-title{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:14px;
+      margin-bottom:10px;
+      flex-wrap:wrap;
+    }
 
-.frente, .verso{
-  position:absolute;
-  width:100%;
-  height:100%;
-  backface-visibility:hidden;
-  border-radius:10px;
-}
+    .hero-title .icon{
+      width:54px;
+      height:54px;
+      border-radius:50%;
+      display:grid;
+      place-items:center;
+      font-size:28px;
+      background:linear-gradient(135deg, rgba(56,189,248,.25), rgba(255,255,255,.08));
+      box-shadow:0 8px 20px rgba(0,0,0,.25);
+    }
 
-.frente{ background:#334155; }
+    h1{
+      font-size:clamp(30px, 4vw, 46px);
+      line-height:1.1;
+    }
 
-.verso{
-  transform: rotateY(180deg);
-  background:white;
-}
+    .subtitle{
+      color:var(--muted);
+      font-size:16px;
+      margin-top:6px;
+    }
 
-.verso img{
-  width:100%; height:100%; border-radius:10px;
-}
+    .home-layout{
+      display:grid;
+      grid-template-columns: 1fr 1.1fr;
+      gap:22px;
+      align-items:start;
+    }
 
-#rank{
-  margin-top:30px;
-  position:relative;
-}
+    .panel{
+      background:linear-gradient(180deg, rgba(29,45,75,.95), rgba(18,29,49,.98));
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:24px;
+      backdrop-filter: blur(8px);
+    }
 
-#resetBtn{
-  position:absolute;
-  top:0;
-  right:0;
-  font-size:10px;
-  padding:3px 6px;
-  cursor:pointer;
-  background:#ef4444;
-  border:none;
-  color:white;
-  border-radius:5px;
-}
+    .panel h2{
+      font-size:24px;
+      margin-bottom:16px;
+    }
 
-#resetBtn:hover{
-  background:#dc2626;
-}
+    .level-buttons{
+      display:grid;
+      grid-template-columns:repeat(3, 1fr);
+      gap:12px;
+      margin:18px 0 22px;
+    }
 
-</style>
-</head>
-<body>
+    .level-btn{
+      border:none;
+      border-radius:16px;
+      padding:16px 10px;
+      font-size:20px;
+      font-weight:bold;
+      cursor:pointer;
+      background:linear-gradient(180deg, var(--accent), var(--accent-2));
+      color:#052033;
+      transition:.25s;
+      box-shadow:0 10px 22px rgba(14,165,233,.22);
+    }
 
-<h1>⚽ Jogo da Memória Futebol</h1>
+    .level-btn:hover{
+      transform:translateY(-3px) scale(1.02);
+      filter:brightness(1.05);
+    }
 
-<div id="menu">
-  <button onclick="iniciar('facil')">Fácil</button>
-  <button onclick="iniciar('medio')">Médio</button>
-  <button onclick="iniciar('dificil')">Difícil</button>
-</div>
+    .level-info{
+      display:grid;
+      gap:12px;
+    }
 
-<div id="topo"></div>
-<div id="tabuleiro"></div>
+    .info-card{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      padding:14px 16px;
+      border-radius:16px;
+      background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.06);
+    }
 
-<div id="rank">
-  <h2>🏆 Ranking</h2>
-  <button id="resetBtn" onclick="resetarRank()">reset</button>
-  <table id="rankTable" border="1" style="margin:auto; background:white; color:black"></table>
-</div>
+    .info-card strong{
+      font-size:17px;
+    }
 
-<script>
-let primeira=null
-let segunda=null
-let travado=false
-let pontos=0
-let tempo=0
-let intervalo
-let dificuldadeAtual
-let jogadorNome=""
+    .info-card span{
+      color:var(--muted);
+      font-size:14px;
+    }
 
-function iniciar(nivel){
-  dificuldadeAtual=nivel
-  document.getElementById("tabuleiro").innerHTML=""
+    .ranking-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      margin-bottom:14px;
+    }
 
-  if(nivel==='facil'){
-    tempo=60
-    criarCartas(8,4)
-  }
-  if(nivel==='medio'){
-    tempo=50
-    criarCartas(12,4)
-  }
-  if(nivel==='dificil'){
-    jogadorNome=prompt("Digite seu nome:")
-    tempo=40
-    pontos=0
-    criarCartasDificil()
-  }
+    .ranking-header h2{
+      margin:0;
+    }
 
-  iniciarTimer()
-}
+    .reset-btn{
+      width:30px;
+      height:30px;
+      border:none;
+      border-radius:8px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+      font-size:13px;
+      background:transparent;
+      color:rgba(255,255,255,.35);
+      border:1px solid rgba(255,255,255,.08);
+      transition:.2s;
+      flex-shrink:0;
+    }
 
-function iniciarTimer(){
-  clearInterval(intervalo)
-  intervalo=setInterval(()=>{
-    tempo--
-    document.getElementById("topo").innerText="Tempo: "+tempo+"s" + (dificuldadeAtual==='dificil' ? " | Pontos: "+pontos : "")
+    .reset-btn:hover{
+      color:#fca5a5;
+      border-color:rgba(239,68,68,.25);
+      background:rgba(239,68,68,.08);
+      transform:scale(1.05);
+    }
 
-    if(tempo<=0){
-      clearInterval(intervalo)
-      alert("Tempo acabou!")
-      if(dificuldadeAtual==='dificil'){
-        salvarRank(jogadorNome,pontos,tempo)
+    .ranking-box{
+      overflow:auto;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.08);
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      overflow:hidden;
+    }
+
+    thead{
+      background:linear-gradient(180deg, rgba(56,189,248,.22), rgba(56,189,248,.10));
+    }
+
+    th, td{
+      text-align:center;
+      padding:12px 10px;
+      font-size:15px;
+    }
+
+    th{
+      color:#e0f2fe;
+      font-size:14px;
+      letter-spacing:.3px;
+    }
+
+    tbody tr{
+      background:rgba(255,255,255,.03);
+      border-top:1px solid rgba(255,255,255,.05);
+    }
+
+    tbody tr:nth-child(even){
+      background:rgba(255,255,255,.05);
+    }
+
+    .empty-rank{
+      color:var(--muted);
+      padding:20px;
+    }
+
+    .game-screen{
+      min-height:78vh;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:flex-start;
+      padding-top:24px;
+    }
+
+    .timer-wrap{
+      margin-bottom:26px;
+      display:flex;
+      justify-content:center;
+      width:100%;
+    }
+
+    .timer-badge{
+      min-width:220px;
+      text-align:center;
+      padding:16px 24px;
+      border-radius:999px;
+      font-size:clamp(24px, 3vw, 34px);
+      font-weight:bold;
+      background:linear-gradient(180deg, rgba(56,189,248,.18), rgba(255,255,255,.06));
+      border:1px solid rgba(56,189,248,.35);
+      box-shadow:0 12px 30px rgba(0,0,0,.25);
+      color:#f8fafc;
+    }
+
+    .board{
+      display:grid;
+      justify-content:center;
+      gap:var(--gap);
+      margin:0 auto;
+      width:100%;
+    }
+
+    .carta{
+      width:var(--card-size);
+      height:var(--card-size);
+      background:none;
+      border:none;
+      padding:0;
+      cursor:pointer;
+      perspective:1000px;
+    }
+
+    .carta:disabled{
+      cursor:default;
+    }
+
+    .card-inner{
+      position:relative;
+      width:100%;
+      height:100%;
+      transform-style:preserve-3d;
+      transition:transform .6s cubic-bezier(.22,.61,.36,1);
+    }
+
+    .carta.virada .card-inner,
+    .carta.acertou .card-inner{
+      transform:rotateY(180deg);
+    }
+
+    .card-face{
+      position:absolute;
+      inset:0;
+      backface-visibility:hidden;
+      border-radius:18px;
+      overflow:hidden;
+      box-shadow:0 8px 18px rgba(0,0,0,.25);
+    }
+
+    .card-front{
+      background:
+        radial-gradient(circle at 30% 30%, rgba(255,255,255,.08), transparent 30%),
+        linear-gradient(180deg, #41526e, #31425d);
+      border:1px solid rgba(255,255,255,.08);
+      display:grid;
+      place-items:center;
+      color:white;
+      font-size:28px;
+    }
+
+    .card-back{
+      transform:rotateY(180deg);
+      background:var(--card-back);
+      border:3px solid rgba(255,255,255,.85);
+    }
+
+    .card-back img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+      background:#fff;
+    }
+
+    .carta.acertou .card-face{
+      box-shadow:0 0 0 2px rgba(34,197,94,.4), 0 8px 22px rgba(34,197,94,.18);
+    }
+
+    .feedback{
+      position:fixed;
+      inset:0;
+      background:rgba(6,11,20,.55);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      z-index:30;
+      backdrop-filter: blur(4px);
+      padding:18px;
+    }
+
+    .feedback-card{
+      width:min(420px, 94%);
+      background:linear-gradient(180deg, #182841, #0f1b2f);
+      border-radius:24px;
+      padding:28px 22px;
+      text-align:center;
+      border:1px solid rgba(255,255,255,.08);
+      box-shadow:var(--shadow);
+      animation:pop .2s ease;
+    }
+
+    @keyframes pop{
+      from{transform:scale(.95); opacity:0;}
+      to{transform:scale(1); opacity:1;}
+    }
+
+    .feedback-card h3{
+      font-size:30px;
+      margin-bottom:10px;
+    }
+
+    .feedback-card p{
+      font-size:18px;
+      color:#dbeafe;
+    }
+
+    .feedback-card strong{
+      color:var(--gold);
+      font-size:26px;
+    }
+
+    .legend{
+      margin-top:18px;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.5;
+    }
+
+    @media (max-width: 920px){
+      .home-layout{
+        grid-template-columns:1fr;
       }
     }
-  },1000)
-}
 
-function criarCartas(qtd, colunas){
-  let tab=document.getElementById("tabuleiro")
-  tab.style.gridTemplateColumns=`repeat(${colunas},80px)`
+    @media (max-width: 640px){
+      .level-buttons{
+        grid-template-columns:1fr;
+      }
 
-  let imagens=[]
-  for(let i=1;i<=qtd/2;i++){
-    imagens.push(i,i)
-  }
+      th, td{
+        font-size:13px;
+        padding:10px 8px;
+      }
 
-  imagens.sort(()=>Math.random()-0.5)
-
-  imagens.forEach(id=>{
-    let carta=document.createElement("div")
-    carta.className="carta"
-    carta.innerHTML=`
-      <div class="inner">
-        <div class="frente"></div>
-        <div class="verso"><img src="img/${id}.png"></div>
-      </div>
-    `
-
-    carta.onclick=()=>virar(carta,id)
-    tab.appendChild(carta)
-  })
-}
-
-function criarCartasDificil(){
-  let tab=document.getElementById("tabuleiro")
-  tab.style.gridTemplateColumns=`repeat(5,80px)`
-
-  let cartas=[
-    {id:'j1', pontos:100},{id:'j1', pontos:100},
-    {id:'j2', pontos:100},{id:'j2', pontos:100},
-
-    {id:'m1', pontos:80},{id:'m1', pontos:80},
-    {id:'m2', pontos:80},{id:'m2', pontos:80},
-    {id:'m3', pontos:80},{id:'m3', pontos:80},
-
-    {id:'i1', pontos:40},{id:'i1', pontos:40},
-    {id:'i2', pontos:40},{id:'i2', pontos:40},
-    {id:'i3', pontos:40},{id:'i3', pontos:40},
-    {id:'i4', pontos:40},{id:'i4', pontos:40}
-  ]
-
-  cartas.sort(()=>Math.random()-0.5)
-
-  cartas.forEach(c=>{
-    let carta=document.createElement("div")
-    carta.className="carta"
-    carta.innerHTML=`
-      <div class="inner">
-        <div class="frente"></div>
-        <div class="verso"><img src="img/${c.id}.png"></div>
-      </div>
-    `
-
-    carta.onclick=()=>virarDificil(carta,c)
-    tab.appendChild(carta)
-  })
-}
-
-function virar(carta,id){
-  if(travado || carta.classList.contains('virada')) return
-  carta.classList.add('virada')
-
-  if(!primeira){
-    primeira={carta,id}
-  }else{
-    segunda={carta,id}
-    travado=true
-
-    if(primeira.id===segunda.id){
-      primeira=null
-      segunda=null
-      travado=false
-    }else{
-      setTimeout(()=>{
-        primeira.carta.classList.remove('virada')
-        segunda.carta.classList.remove('virada')
-        primeira=null
-        segunda=null
-        travado=false
-      },800)
+      .timer-badge{
+        min-width:180px;
+      }
     }
-  }
-}
+  </style>
+</head>
+<body>
+  <div class="app">
 
-function virarDificil(carta,c){
-  if(travado || carta.classList.contains('virada')) return
-  carta.classList.add('virada')
+    <!-- TELA INICIAL -->
+    <section id="homeScreen" class="screen">
+      <div class="hero">
+        <div class="hero-title">
+          <div class="icon">⚽</div>
+          <h1>Jogo da Memória Futebol</h1>
+        </div>
+        <p class="subtitle">Escolha um nível, memorize as cartas e complete tudo antes do tempo acabar.</p>
+      </div>
 
-  if(!primeira){
-    primeira={carta,c}
-  }else{
-    segunda={carta,c}
-    travado=true
+      <div class="home-layout">
+        <div class="panel">
+          <h2>Escolha o nível</h2>
 
-    if(primeira.c.id===segunda.c.id){
-      pontos += primeira.c.pontos
-      primeira=null
-      segunda=null
-      travado=false
-    }else{
-      setTimeout(()=>{
-        primeira.carta.classList.remove('virada')
-        segunda.carta.classList.remove('virada')
-        primeira=null
-        segunda=null
-        travado=false
-      },800)
+          <div class="level-buttons">
+            <button class="level-btn" onclick="iniciar('facil')">Fácil</button>
+            <button class="level-btn" onclick="iniciar('medio')">Médio</button>
+            <button class="level-btn" onclick="iniciar('dificil')">Difícil</button>
+          </div>
+
+          <div class="level-info">
+            <div class="info-card">
+              <strong>Fácil</strong>
+              <span>8 cartas • 1:00</span>
+            </div>
+            <div class="info-card">
+              <strong>Médio</strong>
+              <span>12 cartas • 50s</span>
+            </div>
+            <div class="info-card">
+              <strong>Difícil</strong>
+              <span>20 cartas • 40s • ranking</span>
+            </div>
+          </div>
+
+          <p class="legend">
+            No modo difícil, o jogo pede o nome do jogador e salva no ranking apenas a melhor pontuação.
+          </p>
+        </div>
+
+        <div class="panel">
+          <div class="ranking-header">
+            <h2>🏆 Ranking do Difícil</h2>
+            <button class="reset-btn" onclick="resetarRank()" title="Resetar ranking">🗑</button>
+          </div>
+
+          <div class="ranking-box">
+            <table id="rankTable">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Jogador</th>
+                  <th>Pontos</th>
+                  <th>Tempo</th>
+                  <th>Data</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TELA DO JOGO -->
+    <section id="gameScreen" class="screen game-screen hidden">
+      <div class="timer-wrap">
+        <div id="topo" class="timer-badge">Tempo: 00s</div>
+      </div>
+
+      <div id="tabuleiro" class="board"></div>
+    </section>
+  </div>
+
+  <!-- FEEDBACK FINAL -->
+  <div id="feedback" class="feedback hidden">
+    <div class="feedback-card" id="feedbackCard"></div>
+  </div>
+
+  <script>
+    const RANK_KEY = "rankMemoriaFutebol";
+
+    const homeScreen = document.getElementById("homeScreen");
+    const gameScreen = document.getElementById("gameScreen");
+    const topo = document.getElementById("topo");
+    const tabuleiro = document.getElementById("tabuleiro");
+    const feedback = document.getElementById("feedback");
+    const feedbackCard = document.getElementById("feedbackCard");
+
+    let primeiraCarta = null;
+    let segundaCarta = null;
+    let travado = false;
+    let pontuacao = 0;
+    let tempoRestante = 0;
+    let timer = null;
+    let dificuldadeAtual = "";
+    let jogadorNome = "";
+    let paresEncontrados = 0;
+    let totalPares = 0;
+    let jogoAtivo = false;
+    let fimDaRodada = 0;
+    let ultimoSegundoRenderizado = null;
+
+    const configNiveis = {
+      facil: {
+        tempo: 60,
+        colunas: 4,
+        cartas: [
+          { id: "f1", img: "img/facil/1.png" },
+          { id: "f2", img: "img/facil/2.png" },
+          { id: "f3", img: "img/facil/3.png" },
+          { id: "f4", img: "img/facil/4.png" }
+        ]
+      },
+
+      medio: {
+        tempo: 50,
+        colunas: 4,
+        cartas: [
+          { id: "m1", img: "img/medio/1.png" },
+          { id: "m2", img: "img/medio/2.png" },
+          { id: "m3", img: "img/medio/3.png" },
+          { id: "m4", img: "img/medio/4.png" },
+          { id: "m5", img: "img/medio/5.png" },
+          { id: "m6", img: "img/medio/6.png" }
+        ]
+      },
+
+      dificil: {
+        tempo: 40,
+        colunas: 5,
+        cartas: [
+          { id: "j1", tipo: "jogador", pontos: 100, img: "img/dificil/jogadores/j1.png" },
+          { id: "j2", tipo: "jogador", pontos: 100, img: "img/dificil/jogadores/j2.png" },
+
+          { id: "mc1", tipo: "mascote", pontos: 80, img: "img/dificil/mascotes/m1.png" },
+          { id: "mc2", tipo: "mascote", pontos: 80, img: "img/dificil/mascotes/m2.png" },
+          { id: "mc3", tipo: "mascote", pontos: 80, img: "img/dificil/mascotes/m3.png" },
+
+          { id: "it1", tipo: "item", pontos: 40, img: "img/dificil/itens/i1.png" },
+          { id: "it2", tipo: "item", pontos: 40, img: "img/dificil/itens/i2.png" },
+          { id: "it3", tipo: "item", pontos: 40, img: "img/dificil/itens/i3.png" },
+          { id: "it4", tipo: "item", pontos: 40, img: "img/dificil/itens/i4.png" },
+          { id: "it5", tipo: "item", pontos: 40, img: "img/dificil/itens/i5.png" }
+        ]
+      }
+    };
+
+    function iniciar(nivel){
+      resetarEstadoRodadaBase();
+
+      if(nivel === "dificil"){
+        const nome = pedirNomeJogador();
+        if(!nome) return;
+        jogadorNome = nome;
+      }
+
+      dificuldadeAtual = nivel;
+      tempoRestante = configNiveis[nivel].tempo;
+      pontuacao = 0;
+      paresEncontrados = 0;
+      totalPares = configNiveis[nivel].cartas.length;
+
+      montarTabuleiro(nivel);
+      mostrarTelaJogo();
+      atualizarTopo();
+
+      jogoAtivo = true;
+      iniciarTimer();
     }
-  }
-}
 
-function resetarRank(){
-  let senha = prompt("Digite a senha:")
-  if(senha === "rafael15"){
-    localStorage.removeItem("rank")
-    carregarRank()
-    alert("Ranking apagado!")
-  }else{
-    alert("Senha incorreta!")
-  }
-}
+    function pedirNomeJogador(){
+      let nome = prompt("Digite seu nome para entrar no ranking:");
+      if(nome === null) return null;
 
-function salvarRank(nome, pontos){
-  let rank = JSON.parse(localStorage.getItem("rank")) || []
+      nome = nome.trim();
 
-  let jogador = rank.find(j => j.nome === nome)
+      while(nome === ""){
+        nome = prompt("Digite um nome válido para entrar no ranking:");
+        if(nome === null) return null;
+        nome = nome.trim();
+      }
 
-  if(!jogador){
-    jogador = { nome:nome, pontos:0 }
-    rank.push(jogador)
-  }
+      return nome;
+    }
 
-  if(pontos > jogador.pontos){
-    jogador.pontos = pontos
-  }
+    function mostrarTelaJogo(){
+      homeScreen.classList.add("hidden");
+      gameScreen.classList.remove("hidden");
+    }
 
-  rank.sort((a,b)=> b.pontos - a.pontos || a.nome.localeCompare(b.nome))
+    function mostrarTelaInicial(){
+      clearInterval(timer);
+      jogoAtivo = false;
+      homeScreen.classList.remove("hidden");
+      gameScreen.classList.add("hidden");
+      tabuleiro.innerHTML = "";
+      topo.textContent = "Tempo: 00s";
+      carregarRank();
+    }
 
-  localStorage.setItem("rank", JSON.stringify(rank))
-  carregarRank()
-}
+    function resetarEstadoRodadaBase(){
+      clearInterval(timer);
+      primeiraCarta = null;
+      segundaCarta = null;
+      travado = false;
+      pontuacao = 0;
+      tempoRestante = 0;
+      dificuldadeAtual = "";
+      jogadorNome = "";
+      paresEncontrados = 0;
+      totalPares = 0;
+      jogoAtivo = false;
+      fimDaRodada = 0;
+      ultimoSegundoRenderizado = null;
+      esconderFeedback();
+    }
 
-function carregarRank(){
-  let rank = JSON.parse(localStorage.getItem("rank")) || []
-  let tabela = document.getElementById("rankTable")
+    function montarTabuleiro(nivel){
+      const config = configNiveis[nivel];
+      const deck = embaralhar(
+        config.cartas.flatMap(carta => [{ ...carta }, { ...carta }])
+      );
 
-  tabela.innerHTML = "<tr><th>Jogador</th><th>Pontos</th></tr>"
+      tabuleiro.innerHTML = "";
+      tabuleiro.style.gridTemplateColumns = `repeat(${config.colunas}, var(--card-size))`;
 
-  rank.forEach(j=>{
-    let l=document.createElement("tr")
-    l.innerHTML=`<td>${j.nome}</td><td>${j.pontos}</td>`
-    tabela.appendChild(l)
-  })
-}
+      deck.forEach((dadosCarta) => {
+        const carta = document.createElement("button");
+        carta.type = "button";
+        carta.className = "carta";
 
-carregarRank()
-</script>
+        carta.innerHTML = `
+          <div class="card-inner">
+            <div class="card-face card-front">⚽</div>
+            <div class="card-face card-back">
+              <img src="${dadosCarta.img}" alt="${dadosCarta.id}">
+            </div>
+          </div>
+        `;
 
+        carta.addEventListener("click", () => virarCarta(carta, dadosCarta));
+        tabuleiro.appendChild(carta);
+      });
+    }
+
+    function virarCarta(carta, dadosCarta){
+      if(!jogoAtivo || travado) return;
+      if(carta.classList.contains("virada") || carta.classList.contains("acertou")) return;
+      if(primeiraCarta && primeiraCarta.elemento === carta) return;
+
+      carta.classList.add("virada");
+
+      if(!primeiraCarta){
+        primeiraCarta = { elemento: carta, dados: dadosCarta };
+        return;
+      }
+
+      segundaCarta = { elemento: carta, dados: dadosCarta };
+      travado = true;
+
+      const acertou = primeiraCarta.dados.id === segundaCarta.dados.id;
+
+      if(acertou){
+        setTimeout(() => {
+          primeiraCarta.elemento.classList.add("acertou");
+          segundaCarta.elemento.classList.add("acertou");
+          primeiraCarta.elemento.disabled = true;
+          segundaCarta.elemento.disabled = true;
+
+          if(dificuldadeAtual === "dificil"){
+            pontuacao += primeiraCarta.dados.pontos;
+          }
+
+          paresEncontrados++;
+          limparJogada();
+
+          if(paresEncontrados === totalPares){
+            finalizarJogo(true);
+          }
+        }, 350);
+      } else {
+        setTimeout(() => {
+          primeiraCarta.elemento.classList.remove("virada");
+          segundaCarta.elemento.classList.remove("virada");
+          limparJogada();
+        }, 850);
+      }
+    }
+
+    function limparJogada(){
+      primeiraCarta = null;
+      segundaCarta = null;
+      travado = false;
+    }
+
+    function iniciarTimer(){
+      clearInterval(timer);
+      fimDaRodada = Date.now() + (tempoRestante * 1000);
+      ultimoSegundoRenderizado = null;
+      atualizarTopo();
+
+      timer = setInterval(() => {
+        const segundos = Math.max(0, Math.ceil((fimDaRodada - Date.now()) / 1000));
+
+        if(segundos !== ultimoSegundoRenderizado){
+          tempoRestante = segundos;
+          atualizarTopo();
+        }
+
+        if(tempoRestante <= 0){
+          clearInterval(timer);
+          finalizarJogo(false);
+        }
+      }, 180);
+    }
+
+    function atualizarTopo(){
+      ultimoSegundoRenderizado = tempoRestante;
+      topo.textContent = `Tempo: ${tempoRestante}s`;
+    }
+
+    function finalizarJogo(completouTudo){
+      if(!jogoAtivo) return;
+
+      clearInterval(timer);
+      jogoAtivo = false;
+      travado = true;
+
+      if(dificuldadeAtual === "dificil"){
+        salvarRank(jogadorNome, pontuacao, tempoRestante);
+
+        if(completouTudo){
+          mostrarFeedback("Rodada concluída", `Pontuação final: <strong>${pontuacao}</strong>`);
+        } else {
+          mostrarFeedback("Tempo acabou", `Pontuação final: <strong>${pontuacao}</strong>`);
+        }
+      } else {
+        if(completouTudo){
+          mostrarFeedback("Você completou o nível!", "Voltando para a tela inicial...");
+        } else {
+          mostrarFeedback("Tempo acabou", "Voltando para a tela inicial...");
+        }
+      }
+
+      setTimeout(() => {
+        mostrarTelaInicial();
+      }, 1800);
+    }
+
+    function mostrarFeedback(titulo, texto){
+      feedbackCard.innerHTML = `
+        <h3>${titulo}</h3>
+        <p>${texto}</p>
+      `;
+      feedback.classList.remove("hidden");
+    }
+
+    function esconderFeedback(){
+      feedback.classList.add("hidden");
+      feedbackCard.innerHTML = "";
+    }
+
+    function embaralhar(lista){
+      const array = [...lista];
+      for(let i = array.length - 1; i > 0; i--){
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    function salvarRank(nome, pontos, tempo){
+      let rank = JSON.parse(localStorage.getItem(RANK_KEY)) || [];
+      const chave = nome.trim().toLowerCase();
+
+      let jogador = rank.find(j => j.chave === chave);
+
+      if(!jogador){
+        jogador = {
+          chave,
+          nome: nome.trim(),
+          pontos: pontos,
+          tempo: tempo,
+          data: new Date().toLocaleDateString("pt-BR")
+        };
+        rank.push(jogador);
+      } else if(
+        pontos > jogador.pontos ||
+        (pontos === jogador.pontos && tempo > jogador.tempo)
+      ){
+        jogador.nome = nome.trim();
+        jogador.pontos = pontos;
+        jogador.tempo = tempo;
+        jogador.data = new Date().toLocaleDateString("pt-BR");
+      }
+
+      rank.sort((a, b) =>
+        b.pontos - a.pontos ||
+        b.tempo - a.tempo ||
+        a.nome.localeCompare(b.nome, "pt-BR")
+      );
+
+      localStorage.setItem(RANK_KEY, JSON.stringify(rank));
+      carregarRank();
+    }
+
+    function carregarRank(){
+      const rank = JSON.parse(localStorage.getItem(RANK_KEY)) || [];
+      const tbody = document.querySelector("#rankTable tbody");
+
+      tbody.innerHTML = "";
+
+      if(rank.length === 0){
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="5" class="empty-rank">Nenhum jogador no ranking ainda.</td>
+          </tr>
+        `;
+        return;
+      }
+
+      rank.forEach((jogador, index) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${index + 1}</td>
+          <td>${jogador.nome}</td>
+          <td><strong>${jogador.pontos}</strong></td>
+          <td>${jogador.tempo}s</td>
+          <td>${jogador.data}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function resetarRank(){
+      const senha = prompt("Digite a senha para apagar o ranking:");
+      if(senha === "rafael15"){
+        const confirmar = confirm("Tem certeza que deseja apagar todo o ranking?");
+        if(confirmar){
+          localStorage.removeItem(RANK_KEY);
+          carregarRank();
+          alert("Ranking apagado com sucesso!");
+        }
+      } else if(senha !== null){
+        alert("Senha incorreta!");
+      }
+    }
+
+    document.addEventListener("visibilitychange", () => {
+      if(!document.hidden && jogoAtivo){
+        ultimoSegundoRenderizado = null;
+      }
+    });
+
+    carregarRank();
+  </script>
 </body>
 </html>
