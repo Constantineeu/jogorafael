@@ -66,35 +66,48 @@
       margin-bottom:26px;
     }
 
-    .hero-title{
+    .hero-top{
       display:flex;
+      justify-content:space-between;
       align-items:center;
-      justify-content:center;
-      gap:14px;
-      margin-bottom:10px;
+      gap:12px;
+      margin-bottom:18px;
       flex-wrap:wrap;
     }
 
-    .hero-title .icon{
-      width:54px;
-      height:54px;
-      border-radius:50%;
-      display:grid;
-      place-items:center;
-      font-size:28px;
-      background:linear-gradient(135deg, rgba(56,189,248,.25), rgba(255,255,255,.08));
-      box-shadow:0 8px 20px rgba(0,0,0,.25);
+    .hero-spacer{
+      width:100px;
+    }
+
+    .hero-actions{
+      width:100px;
+      display:flex;
+      justify-content:flex-end;
     }
 
     h1{
       font-size:clamp(30px, 4vw, 46px);
       line-height:1.1;
+      flex:1;
+      text-align:center;
     }
 
-    .subtitle{
-      color:var(--muted);
-      font-size:16px;
-      margin-top:6px;
+    .rules-btn{
+      border:none;
+      border-radius:14px;
+      padding:12px 18px;
+      font-size:15px;
+      font-weight:bold;
+      cursor:pointer;
+      background:linear-gradient(180deg, #fbbf24, #f59e0b);
+      color:#1f2937;
+      transition:.25s;
+      box-shadow:0 10px 22px rgba(245,158,11,.22);
+    }
+
+    .rules-btn:hover{
+      transform:translateY(-2px) scale(1.02);
+      filter:brightness(1.05);
     }
 
     .home-layout{
@@ -122,7 +135,7 @@
       display:grid;
       grid-template-columns:repeat(3, 1fr);
       gap:12px;
-      margin:18px 0 22px;
+      margin-top:18px;
     }
 
     .level-btn{
@@ -141,31 +154,6 @@
     .level-btn:hover{
       transform:translateY(-3px) scale(1.02);
       filter:brightness(1.05);
-    }
-
-    .level-info{
-      display:grid;
-      gap:12px;
-    }
-
-    .info-card{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:10px;
-      padding:14px 16px;
-      border-radius:16px;
-      background:rgba(255,255,255,.05);
-      border:1px solid rgba(255,255,255,.06);
-    }
-
-    .info-card strong{
-      font-size:17px;
-    }
-
-    .info-card span{
-      color:var(--muted);
-      font-size:14px;
     }
 
     .ranking-header{
@@ -384,6 +372,7 @@
     .feedback-card p{
       font-size:18px;
       color:#dbeafe;
+      margin-bottom:18px;
     }
 
     .feedback-card strong{
@@ -391,11 +380,30 @@
       font-size:26px;
     }
 
-    .legend{
-      margin-top:18px;
-      color:var(--muted);
-      font-size:14px;
-      line-height:1.5;
+    .modal-btn{
+      border:none;
+      border-radius:14px;
+      padding:12px 22px;
+      font-size:16px;
+      font-weight:bold;
+      cursor:pointer;
+      background:linear-gradient(180deg, var(--accent), var(--accent-2));
+      color:#052033;
+      transition:.25s;
+    }
+
+    .modal-btn:hover{
+      transform:translateY(-2px) scale(1.02);
+      filter:brightness(1.05);
+    }
+
+    .rules-list{
+      text-align:left;
+      color:#dbeafe;
+      line-height:1.6;
+      font-size:16px;
+      margin:18px 0;
+      padding-left:18px;
     }
 
     @media (max-width: 920px){
@@ -417,6 +425,20 @@
       .timer-badge{
         min-width:180px;
       }
+
+      .hero-top{
+        justify-content:center;
+      }
+
+      .hero-spacer,
+      .hero-actions{
+        width:auto;
+      }
+
+      h1{
+        width:100%;
+        order:-1;
+      }
     }
   </style>
 </head>
@@ -426,11 +448,13 @@
     <!-- TELA INICIAL -->
     <section id="homeScreen" class="screen">
       <div class="hero">
-        <div class="hero-title">
-          <div class="icon">⚽</div>
+        <div class="hero-top">
+          <div class="hero-spacer"></div>
           <h1>Jogo da Memória Futebol</h1>
+          <div class="hero-actions">
+            <button class="rules-btn" onclick="abrirRegras()">Regras</button>
+          </div>
         </div>
-        <p class="subtitle">Escolha um nível, memorize as cartas e complete tudo antes do tempo acabar.</p>
       </div>
 
       <div class="home-layout">
@@ -442,25 +466,6 @@
             <button class="level-btn" onclick="iniciar('medio')">Médio</button>
             <button class="level-btn" onclick="iniciar('dificil')">Difícil</button>
           </div>
-
-          <div class="level-info">
-            <div class="info-card">
-              <strong>Fácil</strong>
-              <span>8 cartas • 1:00</span>
-            </div>
-            <div class="info-card">
-              <strong>Médio</strong>
-              <span>12 cartas • 50s</span>
-            </div>
-            <div class="info-card">
-              <strong>Difícil</strong>
-              <span>20 cartas • 40s • ranking</span>
-            </div>
-          </div>
-
-          <p class="legend">
-            No modo difícil, o jogo pede o nome do jogador e salva no ranking apenas a melhor pontuação.
-          </p>
         </div>
 
         <div class="panel">
@@ -497,7 +502,7 @@
     </section>
   </div>
 
-  <!-- FEEDBACK FINAL -->
+  <!-- FEEDBACK -->
   <div id="feedback" class="feedback hidden">
     <div class="feedback-card" id="feedbackCard"></div>
   </div>
@@ -557,11 +562,9 @@
         cartas: [
           { id: "j1", tipo: "jogador", pontos: 100, img: "img/dificil/jogadores/j1.png" },
           { id: "j2", tipo: "jogador", pontos: 100, img: "img/dificil/jogadores/j2.png" },
-
           { id: "mc1", tipo: "mascote", pontos: 80, img: "img/dificil/mascotes/m1.png" },
           { id: "mc2", tipo: "mascote", pontos: 80, img: "img/dificil/mascotes/m2.png" },
           { id: "mc3", tipo: "mascote", pontos: 80, img: "img/dificil/mascotes/m3.png" },
-
           { id: "it1", tipo: "item", pontos: 40, img: "img/dificil/itens/i1.png" },
           { id: "it2", tipo: "item", pontos: 40, img: "img/dificil/itens/i2.png" },
           { id: "it3", tipo: "item", pontos: 40, img: "img/dificil/itens/i3.png" },
@@ -621,6 +624,7 @@
       gameScreen.classList.add("hidden");
       tabuleiro.innerHTML = "";
       topo.textContent = "Tempo: 00s";
+      esconderFeedback();
       carregarRank();
     }
 
@@ -756,27 +760,30 @@
         salvarRank(jogadorNome, pontuacao, tempoRestante);
 
         if(completouTudo){
-          mostrarFeedback("Rodada concluída", `Pontuação final: <strong>${pontuacao}</strong>`);
+          mostrarFeedback(
+            "Você completou o nível!",
+            `Pontuação final: <strong>${pontuacao}</strong>`
+          );
         } else {
-          mostrarFeedback("Tempo acabou", `Pontuação final: <strong>${pontuacao}</strong>`);
+          mostrarFeedback(
+            "Tempo acabou",
+            `Pontuação final: <strong>${pontuacao}</strong>`
+          );
         }
       } else {
         if(completouTudo){
-          mostrarFeedback("Você completou o nível!", "Voltando para a tela inicial...");
+          mostrarFeedback("Você completou o nível!", "");
         } else {
-          mostrarFeedback("Tempo acabou", "Voltando para a tela inicial...");
+          mostrarFeedback("Tempo acabou", "");
         }
       }
-
-      setTimeout(() => {
-        mostrarTelaInicial();
-      }, 1800);
     }
 
     function mostrarFeedback(titulo, texto){
       feedbackCard.innerHTML = `
         <h3>${titulo}</h3>
         <p>${texto}</p>
+        <button class="modal-btn" onclick="mostrarTelaInicial()">OK</button>
       `;
       feedback.classList.remove("hidden");
     }
@@ -784,6 +791,22 @@
     function esconderFeedback(){
       feedback.classList.add("hidden");
       feedbackCard.innerHTML = "";
+    }
+
+    function abrirRegras(){
+      feedbackCard.innerHTML = `
+        <h3>Regras</h3>
+        <ul class="rules-list">
+          <li>Escolha um nível para começar.</li>
+          <li>Clique nas cartas para virar e encontrar os pares.</li>
+          <li>Se acertar o par, as cartas continuam abertas.</li>
+          <li>Se errar, elas viram novamente.</li>
+          <li>Complete todos os pares antes do tempo acabar.</li>
+          <li>No nível difícil, sua pontuação entra no ranking.</li>
+        </ul>
+        <button class="modal-btn" onclick="esconderFeedback()">Fechar</button>
+      `;
+      feedback.classList.remove("hidden");
     }
 
     function embaralhar(lista){
