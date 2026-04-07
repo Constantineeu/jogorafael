@@ -7,22 +7,39 @@
 body{
   font-family: Arial;
   text-align:center;
-  background:#0f172a;
+  background:linear-gradient(135deg,#0f172a,#1e293b);
   color:white;
 }
 
-h1{margin-top:20px}
+h1{
+  margin-top:20px;
+  font-size:32px;
+}
+
+#menu{
+  margin-top:30px;
+}
 
 #menu button{
   margin:10px;
-  padding:10px 20px;
-  font-size:16px;
+  padding:12px 25px;
+  font-size:18px;
+  border:none;
+  border-radius:10px;
   cursor:pointer;
+  background:#38bdf8;
+  color:#000;
+  transition:0.3s;
+}
+
+#menu button:hover{
+  background:#0ea5e9;
+  transform:scale(1.05);
 }
 
 #topo{
   font-size:24px;
-  margin:10px;
+  margin:15px;
 }
 
 #tabuleiro{
@@ -58,7 +75,7 @@ h1{margin-top:20px}
   border-radius:10px;
 }
 
-.frente{ background:#1e293b; }
+.frente{ background:#334155; }
 
 .verso{
   transform: rotateY(180deg);
@@ -71,13 +88,31 @@ h1{margin-top:20px}
 
 #rank{
   margin-top:30px;
+  position:relative;
+}
+
+#resetBtn{
+  position:absolute;
+  top:0;
+  right:0;
+  font-size:10px;
+  padding:3px 6px;
+  cursor:pointer;
+  background:#ef4444;
+  border:none;
+  color:white;
+  border-radius:5px;
+}
+
+#resetBtn:hover{
+  background:#dc2626;
 }
 
 </style>
 </head>
 <body>
 
-<h1>Jogo da Memória</h1>
+<h1>⚽ Jogo da Memória Futebol</h1>
 
 <div id="menu">
   <button onclick="iniciar('facil')">Fácil</button>
@@ -89,7 +124,8 @@ h1{margin-top:20px}
 <div id="tabuleiro"></div>
 
 <div id="rank">
-  <h2>Ranking (Difícil)</h2>
+  <h2>🏆 Ranking</h2>
+  <button id="resetBtn" onclick="resetarRank()">reset</button>
   <table id="rankTable" border="1" style="margin:auto; background:white; color:black"></table>
 </div>
 
@@ -109,11 +145,11 @@ function iniciar(nivel){
 
   if(nivel==='facil'){
     tempo=60
-    criarCartas(8,2)
+    criarCartas(8,4)
   }
   if(nivel==='medio'){
     tempo=50
-    criarCartas(12,3)
+    criarCartas(12,4)
   }
   if(nivel==='dificil'){
     jogadorNome=prompt("Digite seu nome:")
@@ -172,29 +208,17 @@ function criarCartasDificil(){
   tab.style.gridTemplateColumns=`repeat(5,80px)`
 
   let cartas=[
-    {id:'j1', tipo:'jogador', pontos:100},
-    {id:'j1', tipo:'jogador', pontos:100},
-    {id:'j2', tipo:'jogador', pontos:100},
-    {id:'j2', tipo:'jogador', pontos:100},
+    {id:'j1', pontos:100},{id:'j1', pontos:100},
+    {id:'j2', pontos:100},{id:'j2', pontos:100},
 
-    {id:'m1', tipo:'mascote', pontos:80},
-    {id:'m1', tipo:'mascote', pontos:80},
-    {id:'m2', tipo:'mascote', pontos:80},
-    {id:'m2', tipo:'mascote', pontos:80},
+    {id:'m1', pontos:80},{id:'m1', pontos:80},
+    {id:'m2', pontos:80},{id:'m2', pontos:80},
+    {id:'m3', pontos:80},{id:'m3', pontos:80},
 
-    {id:'i1', tipo:'item', pontos:40},
-    {id:'i1', tipo:'item', pontos:40},
-    {id:'i2', tipo:'item', pontos:40},
-    {id:'i2', tipo:'item', pontos:40},
-
-    {id:'i3', tipo:'item', pontos:40},
-    {id:'i3', tipo:'item', pontos:40},
-
-    {id:'m3', tipo:'mascote', pontos:80},
-    {id:'m3', tipo:'mascote', pontos:80},
-
-    {id:'i4', tipo:'item', pontos:40},
-    {id:'i4', tipo:'item', pontos:40}
+    {id:'i1', pontos:40},{id:'i1', pontos:40},
+    {id:'i2', pontos:40},{id:'i2', pontos:40},
+    {id:'i3', pontos:40},{id:'i3', pontos:40},
+    {id:'i4', pontos:40},{id:'i4', pontos:40}
   ]
 
   cartas.sort(()=>Math.random()-0.5)
@@ -216,7 +240,6 @@ function criarCartasDificil(){
 
 function virar(carta,id){
   if(travado || carta.classList.contains('virada')) return
-
   carta.classList.add('virada')
 
   if(!primeira){
@@ -243,7 +266,6 @@ function virar(carta,id){
 
 function virarDificil(carta,c){
   if(travado || carta.classList.contains('virada')) return
-
   carta.classList.add('virada')
 
   if(!primeira){
@@ -269,7 +291,18 @@ function virarDificil(carta,c){
   }
 }
 
-function salvarRank(nome, pontos, tempo){
+function resetarRank(){
+  let senha = prompt("Digite a senha:")
+  if(senha === "rafael15"){
+    localStorage.removeItem("rank")
+    carregarRank()
+    alert("Ranking apagado!")
+  }else{
+    alert("Senha incorreta!")
+  }
+}
+
+function salvarRank(nome, pontos){
   let rank = JSON.parse(localStorage.getItem("rank")) || []
 
   let jogador = rank.find(j => j.nome === nome)
